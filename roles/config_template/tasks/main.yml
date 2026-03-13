@@ -72,8 +72,9 @@
   ansible.builtin.command: >
     cephadm shell -- bash -c
     "ceph orch restart {{ item.1 }}"
-  loop: "{{ query('subelements', cephadm_changed_items| default([]), 'services') }}"
+  loop: "{{ query('subelements', cephadm_changed_items | default([]), 'services') }}"
   when:
     - inventory_hostname == cephadm_bootstrap_host
     - item.0.reconfig | default(false)
     - item.1 is defined
+  changed_when: true
