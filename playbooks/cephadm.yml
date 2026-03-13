@@ -1,0 +1,30 @@
+---
+- name: Import cephadm deploy playbook
+  import_playbook: cephadm-deploy.yml
+
+- name: Import cephadm pre-commands playbook
+  import_playbook: cephadm-commands-pre.yml
+
+- name: Import cephadm EC profiles playbook
+  import_playbook: cephadm-ec-profiles.yml
+
+- name: Import cephadm CRUSH rules playbook
+  import_playbook: cephadm-crush-rules.yml
+
+- name: Import cephadm pools playbook
+  import_playbook: cephadm-pools.yml
+
+- name: Import cephadm keys playbook
+  import_playbook: cephadm-keys.yml
+
+- name: Import cephadm placement policies playbook
+  import_playbook: cephadm-placement-policies.yml
+
+- name: Import cephadm service spec playbook
+  import_playbook: cephadm-service-spec.yml
+
+- name: Import cephadm config template playbook
+  import_playbook: cephadm-config-template.yml
+
+- name: Import cephadm post-commands playbook
+  import_playbook: cephadm-commands-post.yml

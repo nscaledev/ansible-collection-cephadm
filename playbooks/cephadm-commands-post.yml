@@ -1,0 +1,14 @@
+---
+- name: Run Ceph commands after post-deployment configuration
+  hosts: mons
+  gather_facts: false
+  become: true
+  tags:
+    - cephadm
+    - cephadm-commands
+  tasks:
+    - name: Apply commands role for post-configuration commands
+      ansible.builtin.import_role:
+        name: stackhpc.cephadm.commands
+      vars:
+        cephadm_commands: "{{ cephadm_commands_post | default([]) }}"

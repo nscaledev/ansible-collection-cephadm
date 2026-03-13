@@ -1,0 +1,12 @@
+---
+- name: Define Ceph pools
+  hosts: mons
+  gather_facts: false
+  become: true
+  tags:
+    - cephadm
+    - cephadm-pools
+  tasks:
+    - name: Apply pools role
+      ansible.builtin.import_role:
+        name: stackhpc.cephadm.pools

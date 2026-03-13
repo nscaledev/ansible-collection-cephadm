@@ -1,0 +1,12 @@
+---
+- name: Define Ceph keys
+  hosts: mons
+  gather_facts: false
+  become: true
+  tags:
+    - cephadm
+    - cephadm-keys
+  tasks:
+    - name: Apply keys role
+      ansible.builtin.import_role:
+        name: stackhpc.cephadm.keys

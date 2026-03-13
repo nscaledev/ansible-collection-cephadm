@@ -23,6 +23,12 @@ Roles:
 * [placement_policies](roles/placement_policies/README.md) for managing RGW
   placement policies
 
+Playbooks:
+* [cephadm](playbooks/cephadm.yml) for end-to-end deployment and post-bootstrap
+  configuration
+* [role-focused playbooks](playbooks/README.md) for running individual
+  collection roles
+
 ## Using this collection
 
 Before using the collection, you need to install the collection with the `ansible-galaxy` CLI:
@@ -37,6 +43,13 @@ collections:
 ```
 
 See [Ansible Using collections](https://docs.ansible.com/ansible/latest/user_guide/collections_using.html) for more details.
+
+The collection also ships ready-to-run playbooks under `playbooks/`. For
+example:
+
+```bash
+ansible-playbook -i inventory playbooks/cephadm.yml
+```
 
 ## Release notes handling
 

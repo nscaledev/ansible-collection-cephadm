@@ -1,0 +1,12 @@
+---
+- name: Define Ceph CRUSH rules
+  hosts: mons
+  gather_facts: false
+  become: true
+  tags:
+    - cephadm
+    - cephadm-crush-rules
+  tasks:
+    - name: Apply CRUSH rules role
+      ansible.builtin.import_role:
+        name: stackhpc.cephadm.crush_rules

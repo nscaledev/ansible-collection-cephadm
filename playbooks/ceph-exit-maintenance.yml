@@ -1,0 +1,14 @@
+---
+- name: Ensure Ceph hosts exit maintenance
+  hosts: ceph
+  gather_facts: true
+  any_errors_fatal: true
+  serial: 1
+  become: true
+  tags:
+    - cephadm
+    - ceph-exit-maintenance
+  tasks:
+    - name: Apply exit maintenance role
+      ansible.builtin.import_role:
+        name: stackhpc.cephadm.exit_maintenance

@@ -1,0 +1,12 @@
+---
+- name: Apply cephadm service specifications
+  hosts: mons
+  gather_facts: false
+  become: true
+  tags:
+    - cephadm
+    - cephadm-service-spec
+  tasks:
+    - name: Apply service spec role
+      ansible.builtin.import_role:
+        name: stackhpc.cephadm.service_spec
