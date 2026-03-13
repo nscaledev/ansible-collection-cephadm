@@ -9,3 +9,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Common local files
+.idea
+.DS_Store
+*.log
+.env
+.env.*
