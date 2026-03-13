@@ -1,0 +1,12 @@
+---
+- name: Define RGW placement policies
+  hosts: mons
+  gather_facts: false
+  become: true
+  tags:
+    - cephadm
+    - cephadm-placement-policies
+  tasks:
+    - name: Apply placement policies role
+      ansible.builtin.import_role:
+        name: stackhpc.cephadm.placement_policies

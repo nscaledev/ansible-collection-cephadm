@@ -1,0 +1,12 @@
+---
+- name: Apply cephadm config-key templates
+  hosts: mons
+  gather_facts: false
+  become: true
+  tags:
+    - cephadm
+    - cephadm-config-template
+  tasks:
+    - name: Apply config template role
+      ansible.builtin.import_role:
+        name: stackhpc.cephadm.config_template

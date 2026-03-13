@@ -1,0 +1,14 @@
+---
+- name: Ensure Ceph hosts enter maintenance
+  hosts: ceph
+  gather_facts: true
+  any_errors_fatal: true
+  serial: 1
+  become: true
+  tags:
+    - cephadm
+    - ceph-enter-maintenance
+  tasks:
+    - name: Apply enter maintenance role
+      ansible.builtin.import_role:
+        name: stackhpc.cephadm.enter_maintenance

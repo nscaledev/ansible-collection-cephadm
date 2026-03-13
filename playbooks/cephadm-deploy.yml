@@ -1,0 +1,12 @@
+---
+- name: Deploy Ceph using cephadm
+  hosts: ceph
+  gather_facts: true
+  any_errors_fatal: true
+  tags:
+    - cephadm
+    - cephadm-deploy
+  tasks:
+    - name: Apply cephadm role
+      ansible.builtin.import_role:
+        name: stackhpc.cephadm.cephadm
