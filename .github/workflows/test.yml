@@ -36,6 +36,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           path: ansible_collections/stackhpc/cephadm
+          fetch-depth: 0
 
       - name: Install dependencies
         working-directory: ansible_collections/stackhpc/cephadm
@@ -48,7 +49,20 @@ jobs:
         run: |
           ansible-test sanity --docker --prime-containers
 
+      - name: Fetch base branch for changed-file detection
+        if: github.event_name == 'pull_request'
+        working-directory: ansible_collections/stackhpc/cephadm
+        run: |
+          git fetch origin "${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}"
+
+      - name: Run ansible-test sanity on changed files
+        if: github.event_name == 'pull_request'
+        working-directory: ansible_collections/stackhpc/cephadm
+        run: |
+          ansible-test sanity --verbose --docker --junit --changed --base-branch "origin/${{ github.base_ref }}"
+
       - name: Run ansible-test sanity
+        if: github.event_name != 'pull_request'
         working-directory: ansible_collections/stackhpc/cephadm
         run: |
           ansible-test sanity --verbose --docker --junit
