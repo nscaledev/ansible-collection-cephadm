@@ -609,6 +609,10 @@ def run_module():
             rc, cmd, out, err = exec_command(module,
                                              create_pool(name,
                                                          user_pool_config=user_pool_config))  # noqa: E501
+            if rc != 0:
+                module.fail_json(msg='Failed to create pool {0}'.format(name),
+                                 rc=rc, cmd=cmd, stdout=out, stderr=err,
+                                 changed=False)
             if user_pool_config['application']['value']:
                 rc, _, _, _ = exec_command(module,
                                            enable_application_pool(name,
@@ -621,6 +625,21 @@ def run_module():
                                            enable_ec_overwrites(name))
 
             changed = True
+
+            # Compression must be set after the pool has been created.
+            compression_config = {
+                key: user_pool_config[key]
+                for key in ('compression_algorithm', 'compression_mode')
+                if user_pool_config[key]['value'] is not None
+            }
+            if rc == 0 and compression_config:
+                rc, cmd, out, err = update_pool(module, name,
+                                               compression_config)
+                if rc != 0:
+                    module.fail_json(
+                        msg=('Failed to configure compression for pool {0}'
+                             .format(name)),
+                        rc=rc, cmd=cmd, stdout=out, stderr=err, changed=True)
 
     elif state == "list":
         rc, cmd, out, err = exec_command(module,
