@@ -62,14 +62,17 @@ jobs:
       - name: Fetch base branch for changed-file detection
         if: github.event_name == 'pull_request'
         working-directory: ansible_collections/stackhpc/cephadm
+        env:
+          BASE_REPOSITORY_URL: ${{ github.event.pull_request.base.repo.clone_url }}
+          BASE_REF: ${{ github.base_ref }}
         run: |
-          git fetch origin "${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}"
+          git fetch "$BASE_REPOSITORY_URL" "$BASE_REF:refs/heads/ansible-test-base"
 
       - name: Run ansible-test sanity on changed files
         if: github.event_name == 'pull_request'
         working-directory: ansible_collections/stackhpc/cephadm
         run: |
-          ansible-test sanity --verbose --docker --junit --changed --base-branch "origin/${{ github.base_ref }}"
+          ansible-test sanity --verbose --docker --junit --changed --base-branch ansible-test-base
 
       - name: Run ansible-test sanity
         if: github.event_name != 'pull_request'
