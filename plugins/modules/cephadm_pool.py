@@ -483,8 +483,10 @@ def run_module():
         expected_num_objects=dict(type='str', required=False, default="0"),
         application=dict(type='str', required=False, default=None),
         allow_ec_overwrites=dict(type='bool', required=False, default=False),
-        compression_algorithm=dict(type='str', required=False, default=None),
-        compression_mode=dict(type='str', required=False, default=None)
+        compression_algorithm=dict(type='str', required=False, default=None,
+                                   choices=['lz4', 'snappy', 'zlib', 'zstd']),
+        compression_mode=dict(type='str', required=False, default=None,
+                              choices=['none', 'passive', 'aggressive', 'force'])
     )
 
     module = AnsibleModule(
@@ -633,8 +635,8 @@ def run_module():
                 if user_pool_config[key]['value'] is not None
             }
             if rc == 0 and compression_config:
-                rc, cmd, out, err = update_pool(module, name,
-                                               compression_config)
+                rc, cmd, out, err = update_pool(
+                    module, name, compression_config)
                 if rc != 0:
                     module.fail_json(
                         msg=('Failed to configure compression for pool {0}'

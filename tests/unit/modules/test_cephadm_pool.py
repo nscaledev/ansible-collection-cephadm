@@ -59,6 +59,16 @@ def test_failed_creation_does_not_apply_compression():
     assert len(commands) == 2
 
 
+@pytest.mark.parametrize('parameter', [
+    'compression_algorithm', 'compression_mode',
+])
+def test_invalid_compression_value_is_rejected(parameter):
+    result, commands = run_pool({parameter: 'invalid'}, [], fails=True)
+
+    assert parameter in result['msg']
+    assert commands == []
+
+
 @pytest.mark.parametrize('successful_sets', [0, 1])
 def test_compression_failure_is_reported(successful_sets):
     result, commands = run_pool(

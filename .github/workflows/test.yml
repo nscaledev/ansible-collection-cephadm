@@ -31,6 +31,8 @@ jobs:
           pip install -r test-requirements.txt
 
       - name: Linting code
+        env:
+          ANSIBLE_LIBRARY: ${{ github.workspace }}/plugins/modules
         run: |
           ansible-lint -v --force-color
           antsibull-changelog lint
