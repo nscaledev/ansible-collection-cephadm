@@ -69,6 +69,44 @@ def test_invalid_compression_value_is_rejected(parameter):
     assert commands == []
 
 
+@pytest.mark.parametrize('failed_step', ['application', 'overwrites'])
+def test_failed_pool_setup_stops_with_command_details(failed_step):
+    successful_steps = 0 if failed_step == 'application' else 1
+    result, commands = run_pool(
+        dict(pool_type='erasure', application='rbd',
+             allow_ec_overwrites=True, **COMPRESSION),
+        [(2, '', 'pool does not exist'), (0, '', '')]
+        + [(0, '', '')] * successful_steps
+        + [(1, 'setup output', 'setup failed')], fails=True)
+
+    expected = (['application', 'enable', 'test-pool', 'rbd']
+                if failed_step == 'application'
+                else ['set', 'test-pool', 'allow_ec_overwrites', 'true'])
+    assert result['changed']
+    assert result['rc'] == 1
+    assert result['stdout'] == 'setup output'
+    assert result['stderr'] == 'setup failed'
+    assert result['cmd'][8:] == expected
+    assert commands[-1] == expected
+    assert len(commands) == 3 + successful_steps
+
+
+def test_compression_follows_successful_erasure_pool_setup():
+    result, commands = run_pool(
+        dict(pool_type='erasure', application='rbd',
+             allow_ec_overwrites=True, **COMPRESSION),
+        [(2, '', 'pool does not exist')] + [(0, '', '')] * 5)
+
+    assert result['changed']
+    assert result['rc'] == 0
+    assert commands[2:] == [
+        ['application', 'enable', 'test-pool', 'rbd'],
+        ['set', 'test-pool', 'allow_ec_overwrites', 'true'],
+        ['set', 'test-pool', 'compression_algorithm', 'lz4'],
+        ['set', 'test-pool', 'compression_mode', 'aggressive'],
+    ]
+
+
 @pytest.mark.parametrize('successful_sets', [0, 1])
 def test_compression_failure_is_reported(successful_sets):
     result, commands = run_pool(
