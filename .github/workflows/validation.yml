@@ -17,4 +17,4 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - name: Commit Validation
-        uses: nscaledev/actions/validation/commits@40a036dc0ebedd65d71a5ae0601ced64f275c286 # v0.1.8
+        uses: nscaledev/actions/validation/commits@d7a01f0d62d670a70815e40c64f09be8eee15ea8
