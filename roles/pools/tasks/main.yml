@@ -14,6 +14,8 @@
     target_size_ratio: "{{ item.target_size_ratio | default(omit) }}"
     application: "{{ item.application | default(omit) }}"
     allow_ec_overwrites: "{{ item.allow_ec_overwrites | default(omit) }}"
+    compression_algorithm: "{{ item.compression_algorithm | default(omit) }}"
+    compression_mode: "{{ item.compression_mode | default(omit) }}"
   with_items: "{{ cephadm_pools }}"
   delegate_to: "{{ groups['mons'][0] }}"
   run_once: true

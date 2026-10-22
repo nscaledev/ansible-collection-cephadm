@@ -483,8 +483,10 @@ def run_module():
         expected_num_objects=dict(type='str', required=False, default="0"),
         application=dict(type='str', required=False, default=None),
         allow_ec_overwrites=dict(type='bool', required=False, default=False),
-        compression_algorithm=dict(type='str', required=False, default=None),
-        compression_mode=dict(type='str', required=False, default=None)
+        compression_algorithm=dict(type='str', required=False, default=None,
+                                   choices=['lz4', 'snappy', 'zlib', 'zstd']),
+        compression_mode=dict(type='str', required=False, default=None,
+                              choices=['none', 'passive', 'aggressive', 'force'])
     )
 
     module = AnsibleModule(
@@ -609,18 +611,45 @@ def run_module():
             rc, cmd, out, err = exec_command(module,
                                              create_pool(name,
                                                          user_pool_config=user_pool_config))  # noqa: E501
+            if rc != 0:
+                module.fail_json(msg='Failed to create pool {0}'.format(name),
+                                 rc=rc, cmd=cmd, stdout=out, stderr=err,
+                                 changed=False)
             if user_pool_config['application']['value']:
-                rc, _, _, _ = exec_command(module,
-                                           enable_application_pool(name,
-                                                                   user_pool_config['application']['value']))  # noqa: E501
+                rc, cmd, out, err = exec_command(
+                    module, enable_application_pool(
+                        name, user_pool_config['application']['value']))
+                if rc != 0:
+                    module.fail_json(
+                        msg='Failed to enable application for pool {0}'.format(name),
+                        rc=rc, cmd=cmd, stdout=out, stderr=err, changed=True)
             if user_pool_config['min_size']['value']:
                 # not implemented yet
                 pass
             if user_pool_config['allow_ec_overwrites']['value']:
-                rc, _, _, _ = exec_command(module,
-                                           enable_ec_overwrites(name))
+                rc, cmd, out, err = exec_command(
+                    module, enable_ec_overwrites(name))
+                if rc != 0:
+                    module.fail_json(
+                        msg='Failed to enable EC overwrites for pool {0}'.format(name),
+                        rc=rc, cmd=cmd, stdout=out, stderr=err, changed=True)
 
             changed = True
+
+            # Compression must be set after the pool has been created.
+            compression_config = {
+                key: user_pool_config[key]
+                for key in ('compression_algorithm', 'compression_mode')
+                if user_pool_config[key]['value'] is not None
+            }
+            if compression_config:
+                rc, cmd, out, err = update_pool(
+                    module, name, compression_config)
+                if rc != 0:
+                    module.fail_json(
+                        msg=('Failed to configure compression for pool {0}'
+                             .format(name)),
+                        rc=rc, cmd=cmd, stdout=out, stderr=err, changed=True)
 
     elif state == "list":
         rc, cmd, out, err = exec_command(module,
