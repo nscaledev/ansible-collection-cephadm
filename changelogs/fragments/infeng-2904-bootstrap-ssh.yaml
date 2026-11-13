@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - Skip SSH-key preparation and public-key distribution when the bootstrap host already has Ceph services.

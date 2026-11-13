@@ -4,6 +4,14 @@ This role bootstraps and configures Ceph using cephadm.
 
 [![asciicast](https://asciinema.org/a/752639.svg)](https://asciinema.org/a/752639)
 
+## Existing clusters
+
+SSH-key preparation and public-key distribution run only when the bootstrap host needs bootstrap.
+The role detects this state from service names that start with `ceph`.
+Existing clusters keep their current SSH identity without local copies of the private or public key.
+The existing Cephadm SSH identity must already have access to every managed host.
+Package preparation, image pulls, and OSD configuration still run.
+
 ## Prerequisites
 
 ### Host prerequisites

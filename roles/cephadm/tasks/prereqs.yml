@@ -4,7 +4,9 @@
     user: "{{ cephadm_ssh_user }}"
     state: present
     key: "{{ hostvars[cephadm_bootstrap_host].cephadm_ssh_public_key_content }}"
-  when: "cephadm_ssh_user | length > 0"
+  when:
+    - cephadm_ssh_user | length > 0
+    - hostvars[cephadm_bootstrap_host].cephadm_bootstrap | bool
   become: true
 
 - name: Ensure the Logrotate package is installed
