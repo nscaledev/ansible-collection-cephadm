@@ -4,6 +4,23 @@ This role bootstraps and configures Ceph using cephadm.
 
 [![asciicast](https://asciinema.org/a/752639.svg)](https://asciinema.org/a/752639)
 
+## Existing clusters and new hosts
+
+The role sets `cephadm_bootstrap` from each host's service facts.
+The configured bootstrap MON remains the source of the cluster SSH public key.
+Key preparation on that MON reads existing files even when the MON already has Ceph services.
+Private-key generation runs only for a bootstrap MON that needs bootstrap and has no local private key.
+
+If an existing cluster has no local public-key file, the role reads the current public key from the monitor store and saves it.
+Public-key authorization runs on new hosts without Ceph services.
+Existing hosts skip that authorization task.
+Package preparation, logrotate, image pulls, and OSD configuration remain active.
+
+Keep `cephadm_bootstrap_host` on an existing MON during cluster expansion.
+Set `cephadm_ssh_user` to the existing cluster SSH user.
+A new cluster with a supplied private key also needs its matching public-key file.
+Check mode skips public-key discovery and authorization when the required public key is unavailable.
+
 ## Prerequisites
 
 ### Host prerequisites

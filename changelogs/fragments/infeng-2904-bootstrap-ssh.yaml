@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - Preserve an existing cluster SSH identity and authorize its public key on new hosts without generating a replacement private key.
