@@ -1,3 +1,3 @@
 ---
 bugfixes:
-  - Skip SSH-key preparation and public-key distribution when the bootstrap host already has Ceph services.
+  - Preserve an existing cluster SSH identity and authorize its public key on new hosts without generating a replacement private key.

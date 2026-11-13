@@ -15,7 +15,6 @@
   include_tasks: "prereqs_bootstrap.yml"
   when:
     - inventory_hostname == cephadm_bootstrap_host
-    - cephadm_bootstrap | bool
 
 - name: "Prereq tasks"
   import_tasks: "prereqs.yml"

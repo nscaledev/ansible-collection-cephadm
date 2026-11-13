@@ -6,7 +6,8 @@
     key: "{{ hostvars[cephadm_bootstrap_host].cephadm_ssh_public_key_content }}"
   when:
     - cephadm_ssh_user | length > 0
-    - hostvars[cephadm_bootstrap_host].cephadm_bootstrap | bool
+    - cephadm_bootstrap | bool
+    - hostvars[cephadm_bootstrap_host].cephadm_ssh_public_key_content | length > 0
   become: true
 
 - name: Ensure the Logrotate package is installed
