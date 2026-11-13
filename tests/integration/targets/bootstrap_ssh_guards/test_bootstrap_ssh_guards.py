@@ -4,11 +4,12 @@ import copy
 import os
 from pathlib import Path
 import subprocess
+import sys
 
 import pytest
 import yaml
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = Path(__file__).resolve().parents[4]
 
 
 @pytest.mark.parametrize("bootstrap_required", [False, True])
@@ -41,6 +42,7 @@ def test_ssh_preparation_uses_bootstrap_host_state(
     hosts = {
         name: {
             "ansible_connection": "local",
+            "ansible_python_interpreter": sys.executable,
             "cephadm_bootstrap": (bootstrap_required if name == "mon0"
                                   else not bootstrap_required),
         } for name in ["mon0", "mon1", "osd0"]

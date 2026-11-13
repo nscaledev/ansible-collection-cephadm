@@ -87,6 +87,11 @@ jobs:
         run: |
           ansible-test sanity --verbose --docker --junit
 
+      - name: Run bootstrap SSH integration tests
+        working-directory: ansible_collections/stackhpc/cephadm
+        run: |
+          ansible-test integration --verbose --docker --requirements bootstrap_ssh_guards
+
       - name: Run ansible-test units
         working-directory: ansible_collections/stackhpc/cephadm
         run: |
