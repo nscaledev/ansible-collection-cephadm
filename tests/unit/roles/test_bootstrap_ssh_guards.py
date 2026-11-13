@@ -61,7 +61,7 @@ def test_ssh_preparation_uses_bootstrap_host_state(
     if check_mode:
         command += ["--check", "--diff"]
     result = subprocess.run(command, cwd=tmp_path, env=env,
-                            text=True, capture_output=True)
+                            text=True, capture_output=True, check=False)
     output = result.stdout + result.stderr
     assert result.returncode == 0, output
     if bootstrap_required and not check_mode:
@@ -70,7 +70,7 @@ def test_ssh_preparation_uses_bootstrap_host_state(
         hosts["mon0"]["cephadm_bootstrap"] = False
         inventory_path.write_text(yaml.safe_dump({"all": {"hosts": hosts}}))
         again = subprocess.run(command, cwd=tmp_path, env=env,
-                               text=True, capture_output=True)
+                               text=True, capture_output=True, check=False)
         assert again.returncode == 0, again.stdout + again.stderr
         assert "changed=0" in again.stdout
     else:
