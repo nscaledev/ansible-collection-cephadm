@@ -23,7 +23,9 @@
     path: "{{ cephadm_ssh_private_key }}"
     size: 4096
     comment: "ceph-{{ cephadm_fsid }}"
-  when: not cephadm_check_ceph_id.stat.exists
+  when:
+    - cephadm_bootstrap | bool
+    - not cephadm_check_ceph_id.stat.exists
   register: cephadm_ssh_key
   become: true
 
@@ -35,15 +37,49 @@
     group: root
     mode: "0o644"
   become: true
-  when: not cephadm_check_ceph_id.stat.exists
+  when: cephadm_ssh_key.public_key | default('', true) | length > 0
+
+- name: Check if cephadm public key exists
+  stat:
+    path: "{{ cephadm_ssh_public_key }}"
+  register: cephadm_check_ceph_pub
+
+- name: Read the existing cluster SSH public key
+  command:
+    cmd: "cephadm shell -- ceph cephadm get-pub-key"
+  register: cephadm_existing_ssh_public_key
+  changed_when: false
+  when:
+    - not cephadm_bootstrap | bool
+    - not cephadm_check_ceph_pub.stat.exists
+
+- name: Save the existing cluster SSH public key
+  copy:
+    content: "{{ cephadm_existing_ssh_public_key.stdout }}\n"
+    dest: "{{ cephadm_ssh_public_key }}"
+    owner: root
+    group: root
+    mode: "0o644"
+  become: true
+  when: cephadm_existing_ssh_public_key.stdout | default('') | length > 0
 
 - name: Slurp public key
   slurp:
     src: "{{ cephadm_ssh_public_key }}"
   register: cephadm_ssh_public_key_slurp
-  when: cephadm_check_ceph_id.stat.exists
+  when: cephadm_check_ceph_pub.stat.exists
 
 - name: Set a fact about the SSH public key
   set_fact:
     cephadm_ssh_public_key_content: >-
-      {{ cephadm_ssh_public_key_slurp.content | b64decode if cephadm_check_ceph_id.stat.exists else cephadm_ssh_key.public_key }}
+      {{ (cephadm_ssh_key.public_key | default('', true))
+         or (cephadm_existing_ssh_public_key.stdout | default('', true))
+         or (cephadm_ssh_public_key_slurp.content | default('') | b64decode) }}
+
+- name: Assert that the cluster SSH public key is available
+  assert:
+    that:
+      - ansible_check_mode or cephadm_ssh_public_key_content | length > 0
+    fail_msg: >-
+      No SSH public key is available. A new cluster with a supplied private
+      key also needs its matching cephadm_ssh_public_key file.

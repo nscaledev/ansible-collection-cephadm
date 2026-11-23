@@ -1,0 +1,5 @@
+context/controller
+shippable/posix/group1
+needs/file/roles/cephadm/tasks/main.yml
+needs/file/roles/cephadm/tasks/prereqs.yml
+needs/file/roles/cephadm/tasks/prereqs_bootstrap.yml
